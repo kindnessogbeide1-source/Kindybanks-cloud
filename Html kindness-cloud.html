@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="https://kindybanks-url.vercel.app/logo.png" />
+    <title>KINDYBANKS URL CLOUD | File Sharing Made Simple</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3a86ff;
+            --primary-dark: #2667cc;
+            --secondary: #8338ec;
+            --dark: #1a1d2b;
+            --darker: #0f111a;
+            --light: #f8fafc;
+            --gray: #8b95a5;
+            --success: #06d6a0;
+            --warning: #ffd166;
+            --error: #ef476f;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            min-height: 100vh;
+            color: var(--light);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .tagline {
+            font-size: 1em;
+            color: var(--gray);
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+
+        .welcome-title {
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            color: var(--light);
+        }
+
+        .welcome-text {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 0.9em;
+        }
+
+        .upload-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 35px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(58, 134, 255, 0.03);
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--secondary);
+            background: rgba(131, 56, 236, 0.05);
+        }
+
+        .upload-area.highlight {
+            border-color: var(--secondary);
+            background: rgba(131, 56, 236, 0.08);
+        }
+
+        .upload-icon {
+            font-size: 2.2em;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .upload-hint {
+            color: var(--gray);
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.2);
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(58, 134, 255, 0.3);
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .file-info {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .file-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .file-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .file-info-label {
+            font-size: 0.85em;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .file-info-value {
+            font-weight: 600;
+            color: var(--light);
+            word-break: break-word;
+        }
+
+        .file-preview {
+            max-width: 100%;
+            max-height: 180px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            object-fit: contain;
+        }
+
+        .result-section {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .success-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .success-icon {
+            font-size: 2.5em;
+            color: var(--success);
+            margin-bottom: 10px;
+        }
+
+        .url-display {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+
+        .url-label {
+            font-size: 0.85em;
+            color: var(--gray);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .url-value {
+            font-weight: 600;
+            color: var(--light);
+            word-break: break-all;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, var(--success) 0%, #05b98a 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            flex: 1;
+            min-width: 140px;
+            justify-content: center;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(6, 214, 160, 0.3);
+        }
+
+        .secondary-btn {
+            background: linear-gradient(135deg, var(--gray) 0%, #6b7280 100%);
+        }
+
+        .secondary-btn:hover {
+            box-shadow: 0 6px 16px rgba(107, 114, 128, 0.3);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message, .error-message {
+            margin: 10px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .success-message { color: var(--success); }
+        .error-message { color: var(--error); }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .upload-limit {
+            display: flex;
+            justify-content: flex-start;
+            gap: 30px;
+            margin-top: 20px;
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+
+        .limit-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .limit-item i {
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .file-info-grid { grid-template-columns: 1fr; }
+            .action-buttons { flex-direction: column; }
+            .copy-btn { min-width: 100%; }
+            .upload-limit { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">KINDYBANKS URL CLOUD</div>
+            <div class="tagline">File Sharing Made Simple</div>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <div class="welcome-title">Welcome to KindyBanks URL Cloud</div>
+            <div class="welcome-text">Simply choose your file and click "Upload and Generate URL" to get a shareable link.</div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <div class="section-title">
+                <i class="fas fa-cloud-upload-alt"></i>
+                Upload Files
+            </div>
+            
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon"><i class="fas fa-file-upload"></i></div>
+                <div class="upload-text">Choose a File</div>
+                <div class="upload-hint">No file selected</div>
+                <input type="file" id="fileInput">
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-folder-open"></i> Choose Files
+                </button>
+            </div>
+
+            <div class="upload-limit">
+                <div class="limit-item"><i class="fas fa-hdd"></i> Upload limit: 30MB</div>
+                <div class="limit-item"><i class="fas fa-calendar-times"></i> No Expiring Date</div>
+            </div>
+
+            <img class="file-preview" id="filePreview" src="" alt="Preview">
+
+            <div class="file-info" id="fileInfo">
+                <div class="file-info-grid">
+                    <div class="file-info-item">
+                        <span class="file-info-label">File Name</span>
+                        <span class="file-info-value" id="fileNameText"></span>
+                    </div>
+                    <div class="file-info-item">
+                        <span class="file-info-label">File Size</span>
+                        <span class="file-info-value" id="fileSizeText"></span>
+                    </div>
+                    <div class="file-info-item">
+                        <span class="file-info-label">File Type</span>
+                        <span class="file-info-value" id="fileTypeText"></span>
+                    </div>
+                    <div class="file-info-item">
+                        <span class="file-info-label">Status</span>
+                        <span class="file-info-value">Ready to Upload</span>
+                    </div>
+                </div>
+                <button class="upload-btn" id="uploadBtn" style="width: 100%; margin-top: 15px;">
+                    <i class="fas fa-rocket"></i> Upload and Generate URL
+                </button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Uploading to KindyBanks Cloud...</p>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="result-section" id="resultSection">
+            <div class="success-header">
+                <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+                <h3>Upload Successful!</h3>
+                <p>Your file is now available in the cloud</p>
+            </div>
+
+            <div class="url-display">
+                <div class="url-label">Your Shareable Link:</div>
+                <div class="url-value" id="generatedUrl">https://kindybanks-url.vercel.app/files/example-file.pdf</div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="copy-btn" id="copyUrlBtn">
+                    <i class="fas fa-copy"></i> Copy URL
+                </button>
+                <button class="copy-btn secondary-btn" onclick="location.reload()">
+                    <i class="fas fa-plus"></i> Upload Another
+                </button>
+            </div>
+
+            <div class="success-message" id="copyMessage" style="display:none;">URL copied to clipboard!</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2025 KindyBanks URL Cloud. Made with <i class="fas fa-heart" style="color:#e74c3c;"></i> for easy sharing.
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInfo = document.getElementById('fileInfo');
+        const filePreview = document.getElementById('filePreview');
+        const fileNameText = document.getElementById('fileNameText');
+        const fileSizeText = document.getElementById('fileSizeText');
+        const fileTypeText = document.getElementById('fileTypeText');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const loading = document.getElementById('loading');
+        const resultSection = document.getElementById('resultSection');
+        const generatedUrl = document.getElementById('generatedUrl');
+        const copyUrlBtn = document.getElementById('copyUrlBtn');
+        const copyMessage = document.getElementById('copyMessage');
+        const errorMessage = document.getElementById('errorMessage');
+
+        let selectedFile = null;
+
+        // Drag & Drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('highlight'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('highlight'), false);
+        });
+
+        uploadArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        fileInput.addEventListener('change', () => {
+            handleFiles(fileInput.files);
+        });
+
+        function handleFiles(files) {
+            if (files.length === 0) return;
+            selectedFile = files[0];
+
+            // Check file size (30MB = 30 * 1024 * 1024 bytes)
+            if (selectedFile.size > 30 * 1024 * 1024) {
+                errorMessage.textContent = "File too large! Max 30MB allowed.";
+                errorMessage.style.display = "block";
+                return;
+            } else {
+                errorMessage.style.display = "none";
+            }
+
+            fileNameText.textContent = selectedFile.name;
+            fileSizeText.textContent = formatFileSize(selectedFile.size);
+            fileTypeText.textContent = selectedFile.type || 'Unknown';
+
+            // Preview image/video
+            if (selectedFile.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    filePreview.src = e.target.result;
+                    filePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(selectedFile);
+            } else {
+                filePreview.style.display = 'none';
+            }
+
+            fileInfo.style.display = 'block';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        uploadBtn.addEventListener('click', () => {
+            if (!selectedFile) {
+                errorMessage.textContent = "Please select a file first!";
+                errorMessage.style.display = "block";
+                return;
+            }
+
+            loading.style.display = 'block';
+            uploadBtn.disabled = true;
+
+            // Simulate upload (Replace with real backend)
+            setTimeout(() => {
+                loading.style.display = 'none';
+                uploadBtn.disabled = false;
+
+                // Mock URL (replace with real one from backend)
+                const mockUrl = `https://kindybanks-url.vercel.app/files/${selectedFile.name.replace(/\s+/g, '-').toLowerCase()}`;
+                generatedUrl.textContent = mockUrl;
+
+                resultSection.style.display = 'block';
+                document.querySelector('.upload-section').scrollIntoView({ behavior: 'smooth' });
+            }, 2000);
+        });
+
+        copyUrlBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(generatedUrl.textContent).then(() => {
+                copyMessage.style.display = 'block';
+                setTimeout(() => copyMessage.style.display = 'none', 2000);
+            });
+        });
+    </script>
+</body>
+</html>
